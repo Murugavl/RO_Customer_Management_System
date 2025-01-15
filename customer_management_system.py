@@ -43,6 +43,11 @@ class Customer:
         self.deleteIn = tk.Entry(inFrame, width=20, bd=2, font=("Times New Roman", 15))
         self.deleteIn.grid(row=3, column=1, padx=10, pady=15)
 
+        modelLbl = tk.Label(inFrame, text="Aqua Model", bg=self.clr(169, 202, 226), font=("Times New Roman", 15, "bold"))
+        modelLbl.grid(row=3, column=0, padx=20, pady=15, sticky="w")
+        self.modelIn = tk.Entry(inFrame, width=20, bd=2, font=("Times New Roman", 15))
+        self.modelIn.grid(row=3, column=1, padx=10, pady=15)
+
         amount_receivedLbl = tk.Label(inFrame, text="Amount Received:", bg=self.clr(169, 202, 226), font=("Times New Roman", 15, "bold"))
         amount_receivedLbl.grid(row=4, column=0, padx=20, pady=15, sticky="w")
         self.amount_receivedIn = tk.Entry(inFrame, width=20, bd=2, font=("Times New Roman", 15))
@@ -93,7 +98,7 @@ class Customer:
         y_scrol = tk.Scrollbar(self.tabFrame, orient="vertical")
         y_scrol.pack(side="right", fill="y")
 
-        self.table = ttk.Treeview(self.tabFrame, columns=("Id", "Name", "Ph.no", "Date", "Amount_Received", "Balance_Amount", "Address"),
+        self.table = ttk.Treeview(self.tabFrame, columns=("Id", "Name", "Ph.no", "Date", "Model","Amount_Received", "Balance_Amount", "Address"),
                                 xscrollcommand=x_scrol.set, yscrollcommand=y_scrol.set)
 
         x_scrol.config(command=self.table.xview)
@@ -103,6 +108,7 @@ class Customer:
         self.table.heading("Name", text="Customer Name")
         self.table.heading("Ph.no", text="Ph.No")
         self.table.heading("Date", text="Date")
+        self.table.heading("Model", text="Model")
         self.table.heading("Amount_Received", text="Amount_Received")
         self.table.heading("Balance_Amount", text="Balance_Amount")
         self.table.heading("Address", text="Customer Address")
@@ -112,6 +118,7 @@ class Customer:
         self.table.column("Name", width=150, anchor="center")
         self.table.column("Ph.no", width=100, anchor="center")
         self.table.column("Date", width=120, anchor="center")
+        self.table.heading("Model", text="Model")
         self.table.column("Amount_Received", width=100, anchor="center")
         self.table.column("Balance_Amount", width=150, anchor="center")
         self.table.column("Address", width=200, anchor="center")
@@ -137,6 +144,7 @@ class Customer:
             "Name": self.nameIn.get(),
             "Ph.no": self.phIn.get(),
             "Date": self.deleteIn.get(),
+            "Model":self.modelIn.get(),
             "Amount_Received": int(self.amount_receivedIn.get()) if self.amount_receivedIn.get().isdigit() else 0,
             "Balance_Amount": self.balance_amountIn.get(),
             "Address": self.addressIn.get(),
@@ -162,8 +170,9 @@ class Customer:
                 customer["Name"].upper(),
                 customer["Ph.no"].upper(),
                 customer["Date"].upper(),
+                customer["Model"].upper(),
                 str(customer["Amount_Received"]),
-                customer["Balance_Amount"].upper(),
+                customer["Balance_Amount"],
                 customer["Address"].upper()
             ))
 
@@ -171,6 +180,7 @@ class Customer:
         self.idIn.delete(0, tk.END)
         self.nameIn.delete(0, tk.END)
         self.phIn.delete(0, tk.END)
+        self.modelIn.delete(0,tk.END)
         self.deleteIn.delete(0, tk.END)
         self.amount_receivedIn.delete(0, tk.END)
         self.balance_amountIn.delete(0, tk.END)
@@ -185,8 +195,9 @@ class Customer:
                 customer["Name"].upper(),
                 customer["Ph.no"].upper(),
                 customer["Date"].upper(),
+                customer['Model'].upper(),
                 str(customer["Amount_Received"]),
-                customer["Balance_Amount"].upper(),
+                customer["Balance_Amount"],
                 customer["Address"].upper()
             ))
 
@@ -198,7 +209,7 @@ class Customer:
                 self.table.delete(*self.table.get_children())
                 self.table.insert('', tk.END, values=(
                     customer["Id"], customer["Name"], customer["Ph.no"],
-                    customer["Date"], customer["Amount_Received"], customer["Balance_Amount"], customer["Address"]
+                    customer["Date"], customer["Model"],customer["Amount_Received"], customer["Balance_Amount"], customer["Address"]
                 ))
             else:
                 tk.messagebox.showerror("Error", "customer not found.")
