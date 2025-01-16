@@ -11,7 +11,7 @@ class Customer:
         self.width = self.root.winfo_screenwidth()
         self.height = self.root.winfo_screenheight()
         self.root.geometry(f"{self.width}x{self.height}+0+0")
-        self.root.config(bg=self.clr(245, 245, 245))  
+        self.root.config(bg=self.clr(245, 245, 245))
 
         self.client = pymongo.MongoClient("mongodb://localhost:27017/")
         self.db = self.client["customer_management"]
@@ -43,11 +43,6 @@ class Customer:
         self.deleteIn = tk.Entry(inFrame, width=20, bd=2, font=("Times New Roman", 15))
         self.deleteIn.grid(row=3, column=1, padx=10, pady=15)
 
-        modelLbl = tk.Label(inFrame, text="Aqua Model", bg=self.clr(169, 202, 226), font=("Times New Roman", 15, "bold"))
-        modelLbl.grid(row=3, column=0, padx=20, pady=15, sticky="w")
-        self.modelIn = tk.Entry(inFrame, width=20, bd=2, font=("Times New Roman", 15))
-        self.modelIn.grid(row=3, column=1, padx=10, pady=15)
-
         amount_receivedLbl = tk.Label(inFrame, text="Amount Received:", bg=self.clr(169, 202, 226), font=("Times New Roman", 15, "bold"))
         amount_receivedLbl.grid(row=4, column=0, padx=20, pady=15, sticky="w")
         self.amount_receivedIn = tk.Entry(inFrame, width=20, bd=2, font=("Times New Roman", 15))
@@ -62,6 +57,11 @@ class Customer:
         addressLbl.grid(row=6, column=0, padx=20, pady=15, sticky="w")
         self.addressIn = tk.Entry(inFrame, width=20, bd=2, font=("Times New Roman", 15))
         self.addressIn.grid(row=6, column=1, padx=10, pady=15)
+
+        modelLbl = tk.Label(inFrame, text="Model:", bg=self.clr(169, 202, 226), font=("Times New Roman", 15, "bold"))
+        modelLbl.grid(row=7, column=0, padx=20, pady=15, sticky="w")
+        self.modelIn = tk.Entry(inFrame, width=20, bd=2, font=("Times New Roman", 15))  # New Model input field
+        self.modelIn.grid(row=7, column=1, padx=10, pady=15)
 
         okBtn = tk.Button(inFrame, text="Create", command=self.insertFun, bd=2, relief="raised", bg=self.clr(0, 142, 220), font=("Times New Roman", 20, "bold"), width=20)
         okBtn.grid(padx=30, pady=25, columnspan=2)
@@ -98,8 +98,8 @@ class Customer:
         y_scrol = tk.Scrollbar(self.tabFrame, orient="vertical")
         y_scrol.pack(side="right", fill="y")
 
-        self.table = ttk.Treeview(self.tabFrame, columns=("Id", "Name", "Ph.no", "Date", "Model","Amount_Received", "Balance_Amount", "Address"),
-                                xscrollcommand=x_scrol.set, yscrollcommand=y_scrol.set)
+        self.table = ttk.Treeview(self.tabFrame, columns=("Id", "Name", "Ph.no", "Date", "Amount_Received", "Balance_Amount", "Address", "Model"),
+                                  xscrollcommand=x_scrol.set, yscrollcommand=y_scrol.set)
 
         x_scrol.config(command=self.table.xview)
         y_scrol.config(command=self.table.yview)
@@ -108,20 +108,20 @@ class Customer:
         self.table.heading("Name", text="Customer Name")
         self.table.heading("Ph.no", text="Ph.No")
         self.table.heading("Date", text="Date")
-        self.table.heading("Model", text="Model")
         self.table.heading("Amount_Received", text="Amount_Received")
         self.table.heading("Balance_Amount", text="Balance_Amount")
         self.table.heading("Address", text="Customer Address")
+        self.table.heading("Model", text="Model")  # Added heading for Model
         self.table["show"] = "headings"
 
         self.table.column("Id", width=100, anchor="center")
         self.table.column("Name", width=150, anchor="center")
         self.table.column("Ph.no", width=100, anchor="center")
         self.table.column("Date", width=120, anchor="center")
-        self.table.heading("Model", text="Model")
         self.table.column("Amount_Received", width=100, anchor="center")
         self.table.column("Balance_Amount", width=150, anchor="center")
         self.table.column("Address", width=200, anchor="center")
+        self.table.column("Model", width=100, anchor="center")  # Added column for Model
 
         self.table.pack(fill="both", expand=1)
 
@@ -144,10 +144,10 @@ class Customer:
             "Name": self.nameIn.get(),
             "Ph.no": self.phIn.get(),
             "Date": self.deleteIn.get(),
-            "Model":self.modelIn.get(),
             "Amount_Received": int(self.amount_receivedIn.get()) if self.amount_receivedIn.get().isdigit() else 0,
             "Balance_Amount": self.balance_amountIn.get(),
             "Address": self.addressIn.get(),
+            "Model": self.modelIn.get()  # Add the model field here
         }
 
         if all(customer.values()):
@@ -161,7 +161,6 @@ class Customer:
         else:
             tk.messagebox.showerror("Error", "Please fill in all the fields!")
 
-
     def updateTable(self):
         customers = self.collection.find()
         for customer in customers:
@@ -170,21 +169,21 @@ class Customer:
                 customer["Name"].upper(),
                 customer["Ph.no"].upper(),
                 customer["Date"].upper(),
-                customer["Model"].upper(),
                 str(customer["Amount_Received"]),
-                customer["Balance_Amount"],
-                customer["Address"].upper()
+                customer["Balance_Amount"].upper(),
+                customer["Address"].upper(),
+                customer.get("Model", "N/A").upper()  # If Model doesn't exist, show "N/A"
             ))
 
     def clearFun(self):
-        self.idIn.delete(0, tk.END)
-        self.nameIn.delete(0, tk.END)
-        self.phIn.delete(0, tk.END)
-        self.modelIn.delete(0,tk.END)
-        self.deleteIn.delete(0, tk.END)
-        self.amount_receivedIn.delete(0, tk.END)
-        self.balance_amountIn.delete(0, tk.END)
-        self.addressIn.delete(0, tk.END)
+        self.idIn.delete(0, "end")
+        self.nameIn.delete(0, "end")
+        self.phIn.delete(0, "end")
+        self.deleteIn.delete(0, "end")
+        self.amount_receivedIn.delete(0, "end")
+        self.balance_amountIn.delete(0, "end")
+        self.addressIn.delete(0, "end")
+        self.modelIn.delete(0, "end")
 
     def viewAllcustomers(self):
         self.table.delete(*self.table.get_children())
@@ -195,26 +194,30 @@ class Customer:
                 customer["Name"].upper(),
                 customer["Ph.no"].upper(),
                 customer["Date"].upper(),
-                customer['Model'].upper(),
                 str(customer["Amount_Received"]),
-                customer["Balance_Amount"],
-                customer["Address"].upper()
+                customer["Balance_Amount"].upper(),
+                customer["Address"].upper(),
+                customer.get("Model", "N/A").upper()  # If Model doesn't exist, show "N/A"
             ))
 
     def viewCustomerFun(self):
-        name = self.pIdIn.get().strip()
-        if name:
-            customer = self.collection.find_one({"Name": name})
-            if customer:
-                self.table.delete(*self.table.get_children())
-                self.table.insert('', tk.END, values=(
-                    customer["Id"], customer["Name"], customer["Ph.no"],
-                    customer["Date"], customer["Model"],customer["Amount_Received"], customer["Balance_Amount"], customer["Address"]
-                ))
-            else:
-                tk.messagebox.showerror("Error", "customer not found.")
+        name = self.pIdIn.get()
+        if not name:
+            tk.messagebox.showerror("Error", "Please enter the customer Name to view.")
+            return
+
+        customer = self.collection.find_one({"Name": name})
+        if customer:
+            tk.messagebox.showinfo("Customer Details", f"ID: {customer['Id']}\n"
+                                                     f"Name: {customer['Name']}\n"
+                                                     f"Phone: {customer['Ph.no']}\n"
+                                                     f"Date: {customer['Date']}\n"
+                                                     f"Amount Received: {customer['Amount_Received']}\n"
+                                                     f"Balance: {customer['Balance_Amount']}\n"
+                                                     f"Address: {customer['Address']}\n"
+                                                     f"Model: {customer.get('Model', 'N/A')}")
         else:
-            tk.messagebox.showerror("Error", "Please enter the customer's name.")
+            tk.messagebox.showerror("Error", "Customer not found.")
 
 
     def Amount_UpdateFun(self):
