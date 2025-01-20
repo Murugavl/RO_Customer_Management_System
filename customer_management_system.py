@@ -6,7 +6,7 @@ import pymongo
 class Customer:
     def __init__(self, root):
         self.root = root
-        self.root.title("Customer Management System")
+        self.root.title("RO Customer Management System")
         
         self.width = self.root.winfo_screenwidth()
         self.height = self.root.winfo_screenheight()
@@ -17,7 +17,7 @@ class Customer:
         self.db = self.client["customer_management"]
         self.collection = self.db["customers"]
 
-        title = tk.Label(self.root, bg=self.clr(92, 132, 179), text="Customer Management System", bd=3, relief="groove", font=("Times New Roman", 50, "bold"))
+        title = tk.Label(self.root, bg=self.clr(92, 132, 179), text="RO Customer Management System", bd=3, relief="groove", font=("Times New Roman", 50, "bold"))
         title.pack(side="top", fill="x", pady=10)
 
         inFrame = tk.Frame(self.root, bd=4, relief="groove", bg=self.clr(169, 202, 226))
